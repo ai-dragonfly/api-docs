@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dragonfly AI API - Documentation Swagger</title>
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css">
+  <style>
+    html {
+      box-sizing: border-box;
+      overflow: -moz-scrollbars-vertical;
+      overflow-y: scroll;
+    }
+    
+    *,
+    *:before,
+    *:after {
+      box-sizing: inherit;
+    }
+    
+    body {
+      margin: 0;
+      background: #fafafa;
+    }
+    
+    .swagger-ui .topbar {
+      background-color: #1a365d;
+    }
+    
+    .swagger-ui .info .title {
+      color: #1a365d;
+    }
+    
+    .swagger-ui .btn.execute {
+      background-color: #4299e1;
+      color: #fff;
+      border-color: #4299e1;
+    }
+    
+    .swagger-ui .btn.execute:hover {
+      background-color: #2b6cb0;
+    }
+    
+    .swagger-ui .opblock.opblock-post {
+      background: rgba(73, 204, 144, 0.1);
+      border-color: #49cc90;
+    }
+    
+    .swagger-ui .opblock.opblock-get {
+      background: rgba(97, 175, 254, 0.1);
+      border-color: #61affe;
+    }
+    
+    .swagger-ui .opblock.opblock-put {
+      background: rgba(252, 161, 48, 0.1);
+      border-color: #fca130;
+    }
+    
+    .swagger-ui .opblock.opblock-delete {
+      background: rgba(249, 62, 62, 0.1);
+      border-color: #f93e3e;
+    }
+    
+    .swagger-ui .opblock .opblock-summary-method {
+      font-weight: bold;
+    }
+    
+    .header {
+      background-color: #1a365d;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    
+    .header-links {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .header-links a {
+      color: white;
+      text-decoration: none;
+    }
+    
+    .header-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Dragonfly AI API</h1>
+    <div class="header-links">
+      <a href="swagger.json" target="_blank">Télécharger le JSON</a>
+    </div>
+  </div>
+
+  <div id="swagger-ui"></div>
+
+  <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = function() {
+      const ui = SwaggerUIBundle({
+        url: "swagger.json",
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout",
+        defaultModelsExpandDepth: -1,
+        displayRequestDuration: true,
+        filter: true,
+        syntaxHighlight: {
+          activate: true,
+          theme: "agate"
+        }
+      });
+      
+      window.ui = ui;
+    };
+  </script>
+</body>
+</html>

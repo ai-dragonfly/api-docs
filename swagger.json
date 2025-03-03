@@ -1,0 +1,1194 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Dragonfly AI API",
+    "description": "API pour l'application Dragonfly AI",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Dragonfly Group",
+      "url": "https://dragonflygroup.fr"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://ai.dragonflygroup.fr",
+      "description": "Serveur de production"
+    },
+    {
+      "url": "https://preprod.api.com",
+      "description": "Serveur de préproduction"
+    },
+    {
+      "url": "http://127.0.0.1:44301",
+      "description": "Serveur de développement"
+    }
+  ],
+  "paths": {
+    "/api/login": {
+      "post": {
+        "summary": "Authentification utilisateur",
+        "description": "Authentifie un utilisateur avec son email et son mot de passe",
+        "tags": ["Authentification"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email de l'utilisateur"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "description": "Mot de passe de l'utilisateur"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentification réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Token JWT d'authentification"
+                    },
+                    "expires_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Date d'expiration du token"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification échouée"
+          }
+        }
+      }
+    },
+    "/api/microsoft-login": {
+      "post": {
+        "summary": "Authentification via Microsoft",
+        "description": "Authentifie un utilisateur via Microsoft",
+        "tags": ["Authentification"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Nom de l'utilisateur"
+                  },
+                  "username": {
+                    "type": "string",
+                    "description": "Nom d'utilisateur"
+                  },
+                  "idToken": {
+                    "type": "string",
+                    "description": "Token d'identification Microsoft"
+                  }
+                },
+                "required": ["name", "username", "idToken"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentification réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Token JWT d'authentification"
+                    },
+                    "expires_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Date d'expiration du token"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification échouée"
+          }
+        }
+      }
+    },
+    "/api/token": {
+      "get": {
+        "summary": "Décodage du token",
+        "description": "Décode le token JWT pour obtenir les informations de l'utilisateur",
+        "tags": ["Authentification"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Décodage réussi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token invalide ou expiré"
+          }
+        }
+      }
+    },
+    "/api/token/refresh": {
+      "post": {
+        "summary": "Rafraîchissement du token",
+        "description": "Rafraîchit le token JWT d'authentification",
+        "tags": ["Authentification"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rafraîchissement réussi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Nouveau token JWT d'authentification"
+                    },
+                    "expires_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Date d'expiration du nouveau token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token invalide ou expiré"
+          }
+        }
+      }
+    },
+    "/api/v1/users/me": {
+      "get": {
+        "summary": "Obtenir l'utilisateur courant",
+        "description": "Récupère les informations de l'utilisateur actuellement authentifié",
+        "tags": ["Utilisateurs"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Récupération réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/v1/users/update": {
+      "post": {
+        "summary": "Mettre à jour le profil",
+        "description": "Met à jour les informations du profil de l'utilisateur",
+        "tags": ["Utilisateurs"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Nom de l'utilisateur"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email de l'utilisateur"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mise à jour réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/v1/users/update-password": {
+      "post": {
+        "summary": "Changer le mot de passe",
+        "description": "Change le mot de passe de l'utilisateur",
+        "tags": ["Utilisateurs"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "oldPassword": {
+                    "type": "string",
+                    "format": "password",
+                    "description": "Ancien mot de passe"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "format": "password",
+                    "description": "Nouveau mot de passe"
+                  }
+                },
+                "required": ["oldPassword", "newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Changement de mot de passe réussi"
+          },
+          "401": {
+            "description": "Non authentifié ou ancien mot de passe incorrect"
+          }
+        }
+      }
+    },
+    "/api/v1/users/update-profile-image": {
+      "post": {
+        "summary": "Mettre à jour l'image de profil",
+        "description": "Met à jour l'image de profil de l'utilisateur",
+        "tags": ["Utilisateurs"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profileImage": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Image de profil"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mise à jour réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/v1/user/assistants": {
+      "get": {
+        "summary": "Obtenir les assistants de l'utilisateur",
+        "description": "Récupère la liste des assistants associés à l'utilisateur",
+        "tags": ["Assistants"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Récupération réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Assistant"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/v1/assistants/{assistantId}": {
+      "get": {
+        "summary": "Obtenir un assistant",
+        "description": "Récupère les détails d'un assistant spécifique",
+        "tags": ["Assistants"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "assistantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'assistant"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Récupération réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Assistant"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Assistant non trouvé"
+          }
+        }
+      }
+    },
+    "/api/v1/threads": {
+      "post": {
+        "summary": "Créer un thread",
+        "description": "Crée un nouveau thread de conversation",
+        "tags": ["Threads"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Création réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thread"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/v1/threads/{threadId}": {
+      "get": {
+        "summary": "Obtenir l'historique d'un thread",
+        "description": "Récupère l'historique complet d'un thread",
+        "tags": ["Threads"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "threadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du thread"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Récupération réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadHistory"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Thread non trouvé"
+          }
+        }
+      }
+    },
+    "/api/v1/threads/{threadId}/messages": {
+      "post": {
+        "summary": "Envoyer un message",
+        "description": "Envoie un message dans un thread",
+        "tags": ["Threads"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "threadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du thread"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Message"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message envoyé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadHistory"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Thread non trouvé"
+          }
+        }
+      }
+    },
+    "/api/v1/threads/{threadId}/runs/{runId}/cancel": {
+      "post": {
+        "summary": "Annuler une exécution",
+        "description": "Annule une exécution en cours dans un thread",
+        "tags": ["Threads"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "threadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du thread"
+          },
+          {
+            "name": "runId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'exécution"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "threadId": {
+                    "type": "string",
+                    "description": "ID du thread"
+                  },
+                  "runId": {
+                    "type": "string",
+                    "description": "ID de l'exécution"
+                  }
+                },
+                "required": ["threadId", "runId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Annulation réussie"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Thread ou exécution non trouvé"
+          }
+        }
+      }
+    },
+    "/api/v1/runwithstream": {
+      "post": {
+        "summary": "Exécuter avec streaming",
+        "description": "Exécute un assistant sur un thread avec streaming",
+        "tags": ["Threads"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assistantId": {
+                    "type": "string",
+                    "description": "ID de l'assistant"
+                  },
+                  "threadId": {
+                    "type": "string",
+                    "description": "ID du thread"
+                  }
+                },
+                "required": ["assistantId", "threadId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exécution réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadHistory"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Assistant ou thread non trouvé"
+          }
+        }
+      }
+    },
+    "/api/v1/save": {
+      "post": {
+        "summary": "Sauvegarder un thread",
+        "description": "Sauvegarde un thread pour une utilisation ultérieure",
+        "tags": ["Threads"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedThread"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sauvegarde réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedThread"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/v1/audio/transcriptions": {
+      "post": {
+        "summary": "Transcrire un audio",
+        "description": "Transcrit un fichier audio en texte",
+        "tags": ["Audio"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "audioFile": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Fichier audio à transcrire"
+                  }
+                },
+                "required": ["audioFile"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transcription réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "transcription": {
+                      "type": "string",
+                      "description": "Texte transcrit"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/v1/motd": {
+      "get": {
+        "summary": "Obtenir tous les MOTD",
+        "description": "Récupère tous les messages du jour",
+        "tags": ["MOTD"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Récupération réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MOTD"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/v1/motd/{motdId}/increment-view-counter": {
+      "post": {
+        "summary": "Incrémenter le compteur de vues",
+        "description": "Incrémente le compteur de vues d'un message du jour",
+        "tags": ["MOTD"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "motdId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du message du jour"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Incrémentation réussie"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Message du jour non trouvé"
+          }
+        }
+      }
+    },
+    "/api/v1/comptage-token": {
+      "post": {
+        "summary": "Compter les tokens",
+        "description": "Compte les tokens utilisés dans une conversation",
+        "tags": ["Tokens"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "threadId": {
+                    "type": "string",
+                    "description": "ID du thread"
+                  },
+                  "assistantId": {
+                    "type": "string",
+                    "description": "ID de l'assistant"
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    },
+                    "description": "Données pour le comptage de tokens"
+                  }
+                },
+                "required": ["threadId", "assistantId", "data"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comptage réussi"
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/v1/files": {
+      "post": {
+        "summary": "Télécharger des fichiers",
+        "description": "Télécharge des fichiers sur le serveur",
+        "tags": ["Fichiers"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files[]": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Fichiers à télécharger"
+                  }
+                },
+                "required": ["files[]"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Téléchargement réussi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "fileIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "IDs des fichiers téléchargés"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/v1/file-link/{fileId}": {
+      "post": {
+        "summary": "Obtenir le lien d'un fichier",
+        "description": "Récupère le lien d'accès à un fichier",
+        "tags": ["Fichiers"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du fichier"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Récupération réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Lien d'accès au fichier"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Fichier non trouvé"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de l'utilisateur"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nom de l'utilisateur"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email de l'utilisateur"
+          },
+          "profileImage": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL de l'image de profil"
+          },
+          "role": {
+            "type": "string",
+            "description": "Rôle de l'utilisateur"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date de création du compte"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date de dernière mise à jour du compte"
+          }
+        }
+      },
+      "Assistant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID de l'assistant"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nom de l'assistant"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description de l'assistant"
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Instructions pour l'assistant"
+          },
+          "model": {
+            "type": "string",
+            "description": "Modèle utilisé par l'assistant"
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Outils disponibles pour l'assistant"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date de création de l'assistant"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date de dernière mise à jour de l'assistant"
+          }
+        }
+      },
+      "Thread": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID du thread"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date de création du thread"
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": ["user", "assistant", "system"],
+            "description": "Rôle de l'émetteur du message"
+          },
+          "content": {
+            "type": "string",
+            "description": "Contenu du message"
+          },
+          "fileIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "IDs des fichiers attachés au message"
+          }
+        },
+        "required": ["role", "content"]
+      },
+      "ThreadHistory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID du thread"
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "description": "Messages du thread"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date de création du thread"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date de dernière mise à jour du thread"
+          }
+        }
+      },
+      "SavedThread": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID du thread sauvegardé"
+          },
+          "threadId": {
+            "type": "string",
+            "description": "ID du thread original"
+          },
+          "title": {
+            "type": "string",
+            "description": "Titre du thread sauvegardé"
+          },
+          "userId": {
+            "type": "string",
+            "description": "ID de l'utilisateur propriétaire"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date de création de la sauvegarde"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date de dernière mise à jour de la sauvegarde"
+          }
+        }
+      },
+      "MOTD": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID du message du jour"
+          },
+          "title": {
+            "type": "string",
+            "description": "Titre du message du jour"
+          },
+          "content": {
+            "type": "string",
+            "description": "Contenu du message du jour"
+          },
+          "viewCount": {
+            "type": "integer",
+            "description": "Nombre de vues du message du jour"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date de création du message du jour"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date de dernière mise à jour du message du jour"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token d'authentification. Exemple: Bearer {token}"
+      }
+    }
+  }
+}
