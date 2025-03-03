@@ -1,56 +1,54 @@
-# Instructions pour publier la documentation sur GitHub Pages
+# Instructions pour mettre à jour le dépôt GitHub
 
-Suivez ces étapes pour créer une organisation GitHub et publier la documentation Swagger via cette organisation.
+Ce document explique comment mettre à jour le dépôt GitHub [ai-dragonfly/api-docs](https://github.com/ai-dragonfly/api-docs) avec la nouvelle documentation Swagger de l'API.
 
-## 1. Créer l'organisation GitHub
+## Prérequis
 
-1. Connectez-vous à votre compte GitHub
-2. Cliquez sur votre photo de profil en haut à droite
-3. Sélectionnez "Your organizations"
-4. Cliquez sur "New organization"
-5. Sélectionnez un plan (le plan gratuit est suffisant)
-6. Entrez "ai.dragonfly" comme nom d'organisation
-7. Entrez votre adresse e-mail
-8. Sélectionnez "My personal account" comme propriétaire
-9. Acceptez les conditions d'utilisation et cliquez sur "Next"
-10. Vous pouvez inviter des membres maintenant ou plus tard
-11. Cliquez sur "Complete setup"
+- Git installé sur votre machine
+- Accès au dépôt GitHub [ai-dragonfly/api-docs](https://github.com/ai-dragonfly/api-docs)
 
-## 2. Créer un repository dans l'organisation
+## Étapes
 
-1. Accédez à la page de l'organisation nouvellement créée
-2. Cliquez sur "New repository"
-3. Entrez "api-docs" comme nom du repository
-4. Ajoutez une description (par exemple, "Documentation de l'API Dragonfly AI")
-5. Sélectionnez "Public" comme visibilité
-6. Ne cochez pas "Initialize this repository with a README" car nous avons déjà créé un README
-7. Cliquez sur "Create repository"
+1. Clonez le dépôt existant :
+   ```bash
+   git clone https://github.com/ai-dragonfly/api-docs.git
+   cd api-docs
+   ```
 
-## 3. Pousser les fichiers vers le repository
+2. Supprimez tous les fichiers existants (sauf le dossier .git) :
+   ```bash
+   # Sur Linux/macOS
+   rm -rf $(ls -A | grep -v "^\.git$")
+   
+   # Sur Windows (PowerShell)
+   Get-ChildItem -Force | Where-Object { $_.Name -ne ".git" } | Remove-Item -Recurse -Force
+   ```
 
-Exécutez les commandes suivantes dans le terminal (remplacez `<your-github-username>` par votre nom d'utilisateur GitHub) :
+3. Copiez les nouveaux fichiers dans le dépôt :
+   ```bash
+   # Remplacez /chemin/vers/api-docs-temp par le chemin absolu vers le dossier api-docs-temp
+   cp -r /chemin/vers/api-docs-temp/* .
+   ```
 
-```bash
-cd ai-dragonfly-api-docs
-git remote add origin https://github.com/ai.dragonfly/api-docs.git
-git branch -M main
-git push -u origin main
-```
+4. Committez et poussez les changements :
+   ```bash
+   git add .
+   git commit -m "Mise à jour de la documentation API avec Swagger"
+   git push origin main
+   ```
 
-## 4. Activer GitHub Pages
+5. Activez GitHub Pages (si ce n'est pas déjà fait) :
+   - Allez sur la page du dépôt sur GitHub
+   - Cliquez sur "Settings" (Paramètres)
+   - Faites défiler jusqu'à la section "GitHub Pages"
+   - Dans "Source", sélectionnez la branche "main" et le dossier racine (/)
+   - Cliquez sur "Save" (Enregistrer)
 
-1. Accédez au repository sur GitHub
-2. Cliquez sur "Settings"
-3. Dans le menu de gauche, cliquez sur "Pages"
-4. Dans la section "Source", sélectionnez "Deploy from a branch"
-5. Dans la section "Branch", sélectionnez "main" et "/ (root)" puis cliquez sur "Save"
-6. Attendez quelques minutes que GitHub Pages déploie votre site
+6. Vérifiez que la documentation est bien déployée :
+   - Attendez quelques minutes que GitHub Pages déploie le site
+   - Visitez https://ai-dragonfly.github.io/api-docs/
 
-## 5. Accéder à la documentation
+## Remarques
 
-Une fois le déploiement terminé, vous pourrez accéder à la documentation à l'adresse suivante :
-```
-https://ai.dragonfly.github.io/api-docs/
-```
-
-Vous pouvez partager cette URL avec votre partenaire pour lui donner accès à la documentation de l'API.
+- Si vous avez des problèmes avec GitHub Pages, assurez-vous que le dépôt est public ou que GitHub Pages est activé pour les dépôts privés dans votre organisation.
+- Si vous souhaitez mettre à jour la documentation à l'avenir, répétez les étapes 1 à 4.

@@ -1,134 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Dragonfly AI API - Documentation Swagger</title>
-  <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css">
+  <title>Dragonfly API Documentation</title>
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.0.0/swagger-ui.css">
   <style>
-    html {
-      box-sizing: border-box;
-      overflow: -moz-scrollbars-vertical;
-      overflow-y: scroll;
-    }
-    
-    *,
-    *:before,
-    *:after {
-      box-sizing: inherit;
-    }
-    
-    body {
-      margin: 0;
-      background: #fafafa;
-    }
-    
-    .swagger-ui .topbar {
-      background-color: #1a365d;
-    }
-    
-    .swagger-ui .info .title {
-      color: #1a365d;
-    }
-    
-    .swagger-ui .btn.execute {
-      background-color: #4299e1;
-      color: #fff;
-      border-color: #4299e1;
-    }
-    
-    .swagger-ui .btn.execute:hover {
-      background-color: #2b6cb0;
-    }
-    
-    .swagger-ui .opblock.opblock-post {
-      background: rgba(73, 204, 144, 0.1);
-      border-color: #49cc90;
-    }
-    
-    .swagger-ui .opblock.opblock-get {
-      background: rgba(97, 175, 254, 0.1);
-      border-color: #61affe;
-    }
-    
-    .swagger-ui .opblock.opblock-put {
-      background: rgba(252, 161, 48, 0.1);
-      border-color: #fca130;
-    }
-    
-    .swagger-ui .opblock.opblock-delete {
-      background: rgba(249, 62, 62, 0.1);
-      border-color: #f93e3e;
-    }
-    
-    .swagger-ui .opblock .opblock-summary-method {
-      font-weight: bold;
-    }
-    
-    .header {
-      background-color: #1a365d;
-      color: white;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
-    
-    .header-links {
-      display: flex;
-      gap: 20px;
-    }
-    
-    .header-links a {
-      color: white;
-      text-decoration: none;
-    }
-    
-    .header-links a:hover {
-      text-decoration: underline;
-    }
+    body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    #swagger-ui { max-width: 1200px; margin: 0 auto; }
+    .topbar { display: none; }
+    .header { padding: 20px; text-align: center; background-color: #f8f9fa; margin-bottom: 20px; }
+    .header h1 { margin: 10px 0; color: #333; }
+    .format-selector { margin: 20px; text-align: center; }
+    .format-selector select { padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
+    .footer { text-align: center; margin-top: 40px; padding: 20px; background-color: #f8f9fa; font-size: 14px; color: #666; }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>Dragonfly AI API</h1>
-    <div class="header-links">
-      <a href="swagger.json" target="_blank">Télécharger le JSON</a>
-    </div>
+    <h1>Dragonfly API Documentation</h1>
+    <p>Documentation complète de l'API Dragonfly</p>
+  </div>
+
+  <div class="format-selector">
+    <label for="format">Format de documentation: </label>
+    <select id="format" onchange="changeFormat()">
+      <option value="swagger.json">JSON</option>
+      <option value="swagger.yaml">YAML</option>
+    </select>
   </div>
 
   <div id="swagger-ui"></div>
 
-  <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
-  <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
+  <div class="footer">
+    <p>&copy; 2025 Dragonfly Group. Tous droits réservés.</p>
+  </div>
+
+  <script src="https://unpkg.com/swagger-ui-dist@5.0.0/swagger-ui-bundle.js"></script>
   <script>
-    window.onload = function() {
-      const ui = SwaggerUIBundle({
-        url: "swagger.json",
+    function changeFormat() {
+      const format = document.getElementById('format').value;
+      window.ui = SwaggerUIBundle({
+        url: format,
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
           SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset
+          SwaggerUIBundle.SwaggerUIStandalonePreset
         ],
-        plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
-        ],
-        layout: "StandaloneLayout",
-        defaultModelsExpandDepth: -1,
-        displayRequestDuration: true,
-        filter: true,
-        syntaxHighlight: {
-          activate: true,
-          theme: "agate"
-        }
+        layout: "BaseLayout"
       });
-      
-      window.ui = ui;
+    }
+    
+    // Initialisation
+    window.onload = function() {
+      changeFormat();
     };
   </script>
 </body>
